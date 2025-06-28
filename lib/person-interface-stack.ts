@@ -1,4 +1,4 @@
-import { Duration, Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -16,7 +16,7 @@ export class PersonInterfaceStack extends Stack {
 
         // Create the API Gateway REST API
         const api = new apigateway.RestApi(this, 'PersonApi', {
-            restApiName: 'Person Service',
+            restApiName: 'Person Service API',
             description: 'This service serves person data.',
             deployOptions: {
                 stageName: 'dev',
@@ -52,9 +52,9 @@ export class PersonInterfaceStack extends Stack {
         });
 
         // Example resource and method (replace with your actual resources/methods)
-        const persons = api.root.addResource('persons');
-        persons.addMethod('GET', new apigateway.LambdaIntegration(input.lambda), {
-            operationName: 'GetPersons',
+        const personApi = api.root.addResource('person');
+        personApi.addMethod('GET', new apigateway.LambdaIntegration(input.lambda), {
+            operationName: 'GetPerson',
             methodResponses: [
                 {
                     statusCode: '200',
@@ -77,7 +77,7 @@ export class PersonInterfaceStack extends Stack {
             ],
         });
         // Add a POST method to create a new person
-        persons.addMethod('POST', new apigateway.LambdaIntegration(input.lambda), {
+        personApi.addMethod('POST', new apigateway.LambdaIntegration(input.lambda), {
             operationName: 'CreatePerson',
             requestModels: {
                 'application/json': personModel,

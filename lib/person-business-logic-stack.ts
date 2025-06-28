@@ -26,8 +26,7 @@ export class PersonBusinessLogicStack extends Stack {
       handler: 'person-lambda.handler',
       timeout: Duration.seconds(30),
       environment: {
-        PERSON_TABLE_NAME: input.personTableName,
-        PERSON_TABLE_ARN: input.personTableArn,
+        TABLE_NAME: input.personTableName,
         EVENT_BUS_NAME: input.eventBusName 
       },
     });
@@ -44,8 +43,8 @@ export class PersonBusinessLogicStack extends Stack {
     
     // Grant the Lambda function permissions to access the DynamoDB table
     personLambda.addToRolePolicy(new iam.PolicyStatement({
-      actions: ['dynamodb:PutItem', 'dynamodb:GetItem', 'dynamodb:Query'],
-      resources: [`arn:aws:dynamodb:${this.region}:${this.account}:table/PersonTable`],
+      actions: ['dynamodb:PutItem', 'dynamodb:GetItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem'],
+      resources: [input.personTableArn],
     }));
   }
 }
