@@ -4,11 +4,17 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
+export interface PersonBusinessLogicStackInput {
+  readonly personTableName: string;
+  readonly personTableArn: string;
+  readonly eventBusName: string;
+}
+
 export class PersonBusinessLogicStack extends Stack {
   public readonly lambda: lambda.Function;
   eventBusName: string;
 
-  constructor(scope: Construct, id: string, table: string, props: StackProps) {
+  constructor(scope: Construct, id: string, input: PersonBusinessLogicStackInput, props?: StackProps) {
     super(scope, id, props);
 
     this.eventBusName = 'PersonEventBus';
@@ -20,8 +26,9 @@ export class PersonBusinessLogicStack extends Stack {
       handler: 'person-lambda.handler',
       timeout: Duration.seconds(30),
       environment: {
-        PERSON_TABLE_NAME: table,
-        EVENT_BUS_NAME: this.eventBusName,
+        PERSON_TABLE_NAME: input.personTableName,
+        PERSON_TABLE_ARN: input.personTableArn,
+        EVENT_BUS_NAME: input.eventBusName 
       },
     });
 
@@ -29,11 +36,12 @@ export class PersonBusinessLogicStack extends Stack {
 
     // Create EventBridge resources that the Lambda function will publish to
     const eventBus = new events.EventBus(this, 'PersonEventBus', {
-      eventBusName: this.eventBusName,
+      eventBusName: input.eventBusName,
     });
 
     // Grant the Lambda function permissions to put events to the EventBridge bus
     eventBus.grantPutEventsTo(personLambda);
+    
     // Grant the Lambda function permissions to access the DynamoDB table
     personLambda.addToRolePolicy(new iam.PolicyStatement({
       actions: ['dynamodb:PutItem', 'dynamodb:GetItem', 'dynamodb:Query'],

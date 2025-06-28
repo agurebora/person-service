@@ -59,14 +59,14 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     const personData = validatePersonData(JSON.parse(event.body));
-    const id = uuidv4();
+    const personId = uuidv4();
     const timestamp = new Date().toISOString();
 
     // Save to DynamoDB Table
     const putItemCommand = new PutItemCommand({
       TableName: process.env.PERSON_TABLE_NAME,
       Item: {
-        id: { S: id },
+        personId: { S: personId },
         firstName: { S: personData.firstName },
         lastName: { S: personData.lastName },
         phoneNumber: { S: personData.phoneNumber },
@@ -88,7 +88,7 @@ export const handler: APIGatewayProxyHandler = async (
 
     // Publish event to EventBridge
     const eventDetail = {
-      id,
+      personId,
       firstName: personData.firstName,
       lastName: personData.lastName,
       phoneNumber: personData.phoneNumber,
@@ -109,7 +109,7 @@ export const handler: APIGatewayProxyHandler = async (
 
     await eventBridgeClient.send(putEventsCommand);
 
-    console.log(`Person created successfully with ID: ${id}`);
+    console.log(`Person created successfully with ID: ${personId}`);
 
     return {
       statusCode: 201,
@@ -118,7 +118,6 @@ export const handler: APIGatewayProxyHandler = async (
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        id,
         message: 'Person created successfully',
         ...eventDetail
       })
