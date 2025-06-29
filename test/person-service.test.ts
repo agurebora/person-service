@@ -50,14 +50,16 @@ describe('Person Service CDK Stacks', () => {
     });
     const stack = new PersonInterfaceStack(app, 'TestPersonInterfaceStack', { lambda: dummyLambda });
     const template = Template.fromStack(stack);
-    template.hasResourceProperties('AWS::ApiGateway::Resource', {
-      PathPart: 'person'
+    // Check for HTTP API resource
+    template.hasResourceProperties('AWS::ApiGatewayV2::Api', {
+      Name: 'Person Service HTTP API',
     });
-    template.hasResourceProperties('AWS::ApiGateway::Method', {
-      HttpMethod: 'POST'
+    // Check for HTTP API route for /person (GET and POST)
+    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+      RouteKey: 'GET /person',
     });
-    template.hasResourceProperties('AWS::ApiGateway::Method', {
-      HttpMethod: 'GET'
+    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+      RouteKey: 'POST /person',
     });
   });
 });

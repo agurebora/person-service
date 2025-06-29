@@ -22,14 +22,21 @@ The architecture is fully serverless and easily deployable.
 ## Prerequisites
 
 - Node.js (v18 or later recommended)
-- AWS CLI configured
 - AWS CDK v2 (`npm install -g aws-cdk`)
 
 
 ## Install Dependencies
 
+Install dependencies for the CDK project
+
 ```
 npm install
+```
+
+Install dependencies for Lambda
+
+```
+cd ./lambda && npm install
 ```
 
 ## Run Tests
