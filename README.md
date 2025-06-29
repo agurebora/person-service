@@ -36,7 +36,7 @@ npm install
 Install dependencies for Lambda
 
 ```
-cd ./lambda && npm install
+cd ./lambda && npm install && cd ..
 ```
 
 ## Run Tests
@@ -76,7 +76,7 @@ Deploy the CDK stacks to your AWS account/region:
 cdk deploy --all
 ```
 
-You can also deploy stacks individually
+Optionally you can also deploy stacks individually
 
 ```
 cdk deploy PersonDataStack
@@ -92,14 +92,18 @@ The API endpoint will be output after deployment. Use this endpoint to create an
 
 ## CURL request examples
 
-Export PERSON_API_ENDPOINT value with the API endpoint provided by CDK: PersonInterfaceStack.HttpApiPersonUrl
+Export PERSON_API_ENDPOINT value with the API endpoint provided by CDK: `PersonInterfaceStack.HttpApiPersonUrl`
 
 ```
 export PERSON_API_ENDPOINT=<api-endpoint>
 ```
+
+To list all persons, you can use the following CURL command:
 ```
 curl --location $PERSON_API_ENDPOINT
 ```
+
+To create a new person, use this CURL command:
 ```
 curl --location $PERSON_API_ENDPOINT \
 --header 'Content-Type: application/json' \

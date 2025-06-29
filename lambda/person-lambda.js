@@ -1,5 +1,7 @@
+
 const { DynamoDBClient, ScanCommand, PutItemCommand } = require('@aws-sdk/client-dynamodb');
 const { EventBridgeClient, PutEventsCommand } = require('@aws-sdk/client-eventbridge');
+const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 const dynamoClient = new DynamoDBClient({});
@@ -32,13 +34,16 @@ exports.handler = async (event) => {
     // Support REST API and HTTP API event structures
     const method = event.httpMethod || (event.requestContext && event.requestContext.http && event.requestContext.http.method);
 
+
     if (method === 'GET') {
       const command = new ScanCommand({ TableName: TABLE_NAME });
       const data = await dynamoClient.send(command);
+      // Unmarshall each item to plain JS object
+      const items = (data.Items || []).map(unmarshall);
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data.Items || []),
+        body: JSON.stringify(items),
       };
     }
 
