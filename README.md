@@ -46,9 +46,12 @@ Configure your AWS credentials through environment variables
 
 ```
 export AWS_REGION=<your-preferred-region>
+```
+```
 export AWS_ACCESS_KEY_ID=<your-access-key-id>
+```
+```
 export AWS_SECRET_ACCESS_KEY=<your-secret-key>
-
 ```
 
 Before deploying for the first time, run:
@@ -56,7 +59,6 @@ Skip this step if you have already setup CDK with your account.
 
 ```
 cdk bootstrap
-
 ```
 
 ## Deploy the Service
@@ -71,22 +73,27 @@ You can also deploy stacks individually
 
 ```
 cdk deploy PersonDataStack
-
+```
+```
 cdk deploy PersonBusinessLogicStack
-
+```
+```
 cdk deploy PersonInterfaceStack
 ```
 
+The API endpoint will be output after deployment. Use this endpoint to create and list persons in the next step.
+
 ## CURL request examples
 
-You can run the the following commands to the Person API.
 Export PERSON_API_ENDPOINT value with the API endpoint provided by CDK: PersonInterfaceStack.HttpApiPersonUrl
 
 ```
 export PERSON_API_ENDPOINT=<api-endpoint>
-
+```
+```
 curl --location $PERSON_API_ENDPOINT
-
+```
+```
 curl --location $PERSON_API_ENDPOINT \
 --header 'Content-Type: application/json' \
 --data '{
@@ -111,10 +118,3 @@ To remove all resources created by this project:
 ```
 cdk destroy --all
 ```
-
-## Notes
-
-- The API endpoint will be output after deployment. Use this endpoint to create and list persons.
-- All resources are tagged according with the service name.
-
-
