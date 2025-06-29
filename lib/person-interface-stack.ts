@@ -1,6 +1,7 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
+import * as integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { applyTags } from './applyTags';
 
@@ -10,34 +11,42 @@ export interface PersonInterfaceStackInput {
 }
 
 export class PersonInterfaceStack extends Stack {
-    // The constructor for the PersonInterfaceStack contains lambda
-    // integration with API Gateway, allowing the Lambda function to be invoked
-    // via HTTP requests through the API Gateway.
     constructor(scope: Construct, id: string, input: PersonInterfaceStackInput , props?: StackProps) {
         super(scope, id, props);
 
-        // Create the API Gateway REST API
-        const api = new apigateway.RestApi(this, 'PersonApi', {
-            restApiName: 'Person Service API',
-            description: 'This service serves person data.',
-            deployOptions: {
-                stageName: 'dev',
-                tracingEnabled: true,
-            },
-        })
-
-        // Apply tags to the API Gateway
-        applyTags(api, props?.tags);
-
-        // Example resource and method (replace with your actual resources/methods)
-        const personApi = api.root.addResource('person');
-        personApi.addMethod('GET', new apigateway.LambdaIntegration(input.lambda), {
-            operationName: 'GetPerson',
-        });
-        // Add a POST method to create a new person
-        personApi.addMethod('POST', new apigateway.LambdaIntegration(input.lambda), {
-            operationName: 'CreatePerson',
+        // Create the HTTP API with a default stage and autoDeploy enabled
+        const httpApi = new apigatewayv2.HttpApi(this, 'PersonHttpApi', {
+            apiName: 'Person Service HTTP API',
+            description: 'Person service API',
+            createDefaultStage: true,
         });
 
+        // Apply tags to the HTTP API
+        applyTags(httpApi, props?.tags);
+
+        // Lambda integration for HTTP API
+        const lambdaIntegration = new integrations.HttpLambdaIntegration(
+            'PersonLambdaIntegration',
+            input.lambda
+        );
+
+        // Add routes for GET and POST /person
+        httpApi.addRoutes({
+            path: '/person',
+            methods: [apigatewayv2.HttpMethod.GET, apigatewayv2.HttpMethod.POST],
+            integration: lambdaIntegration,
+        });
+
+        // Output the API Gateway default endpoint
+        new CfnOutput(this, 'HttpApiUrl', {
+            value: httpApi.apiEndpoint,
+            description: 'The default endpoint for the Person Service HTTP API',
+        });
+
+        // Output the API Gateway default endpoint with /person path
+        new CfnOutput(this, 'HttpApiPersonUrl', {
+            value: `${httpApi.apiEndpoint}/person`,
+            description: 'The endpoint for the Person Service HTTP API with /person path',
+        }); 
     }
 }

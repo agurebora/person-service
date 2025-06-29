@@ -4,10 +4,10 @@ import { PersonBusinessLogicStack } from '../lib/person-business-logic-stack';
 import { PersonDataStack } from '../lib/person-data-stack';
 import { PersonInterfaceStack } from '../lib/person-interface-stack';
 
+
 const stackProps: cdk.StackProps = {
   tags: {
-    service: 'PersonService',
-    env: 'dev',
+    service: 'PersonService'
   },
 };
 
