@@ -22,7 +22,7 @@ The architecture is fully serverless and easily deployable.
 ## Prerequisites
 
 - Node.js (v18 or later recommended)
-- AWS CLI configured with appropriate credentials
+- AWS CLI configured
 - AWS CDK v2 (`npm install -g aws-cdk`)
 
 
