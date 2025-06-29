@@ -1,6 +1,8 @@
-import { Duration, Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Stack, StackProps, Tags } from 'aws-cdk-lib';
 import * as aws_dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
+import { applyTags } from './applyTags';
+
 
 export class PersonDataStack extends Stack {
   public readonly tableName: string;
@@ -15,6 +17,9 @@ export class PersonDataStack extends Stack {
       sortKey: { name: 'lastName', type: aws_dynamodb.AttributeType.STRING },
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
     });
+
+    // Apply tags from props to the table
+    applyTags(personTable, props?.tags);
 
     this.tableName = personTable.tableName;
     this.tableArn = personTable.tableArn;

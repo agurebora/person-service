@@ -1,8 +1,10 @@
-import { Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { Duration, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
+import { applyTags } from './applyTags';
+
 
 export interface PersonBusinessLogicStackInput {
   readonly personTableName: string;
@@ -31,7 +33,11 @@ export class PersonBusinessLogicStack extends Stack {
       },
     });
 
+    // Store the Lambda function in a class property for later use
     this.lambda = personLambda;
+    
+    // Apply tags to the Lambda function
+    applyTags(personLambda, props?.tags);
 
     // Create EventBridge resources that the Lambda function will publish to
     const eventBus = new events.EventBus(this, 'PersonEventBus', {
